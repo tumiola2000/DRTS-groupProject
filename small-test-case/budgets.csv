@@ -1,0 +1,4 @@
+component_id,scheduler,budget,period,core_id
+Component_1,EDF,14.0,62.0,Core_1
+Component_2,RM,1.0,8.0,Core_1
+Component_3,RM,4.0,7.0,Core_1

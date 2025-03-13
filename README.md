@@ -1,7 +1,7 @@
 
 # 02225 Project Test Cases
 
-This folder contains test cases files in a CSV format that define test cases for the 02225 DRTS project.  These files specify the task set, architecture model, and initial component budgets/periods for a hierarchical scheduling system.  
+This folder contains test cases in a CSV format that define test cases for the 02225 DRTS project. These files specify the task set, architecture model, and initial component budgets/periods for a hierarchical scheduling system.  
 
 ## Files
 
@@ -59,6 +59,7 @@ This file provides the initial budget and period for each component, derived fro
 **Columns:**
 
 *   **`component_id`:** The ID of the component (string).  This matches the `component_id` used in `tasks.csv`.
+*   **`scheduler`:** The scheduling algorithm used for the component (either "EDF" or "RM") (string).
 *   **`budget`:**  The initial budget (Q) for the component, in time units (float). This value represents the resource allocation for each component.
 *   **`period`:** The initial period (P) for the component, in time units (float).
 *    **`core_id`:**  The ID of the core to which the component is assigned (string). This corresponds to the `core_id` in `architecture.csv`.

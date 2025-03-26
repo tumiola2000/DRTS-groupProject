@@ -25,7 +25,7 @@ def load_tasks(filename):
     return tasks
 
 
-def simulate(tasks, simulation_time):
+def simulate(tasks, simulation_time, force_wcet=False):
     """
     Event-based simulation of fixed-priority preemptive scheduling.
 
@@ -53,7 +53,10 @@ def simulate(tasks, simulation_time):
             task_name = task["Task"]
             while next_release[task_name] <= currentTime:
                 # Use the scheduled release time as the job's release time.
-                exec_time = random.randint(task["BCET"], task["WCET"])
+                if force_wcet:
+                    exec_time = task["WCET"]
+                else:
+                    exec_time = random.randint(task["BCET"], task["WCET"])
                 job = {
                     "task": task_name,
                     "release": next_release[task_name],
@@ -97,8 +100,12 @@ def simulate(tasks, simulation_time):
         else:
             # If no jobs are ready, jump to the next release event.
             next_release_event = min(next_release.values())
-            # Make sure we don't advance past simulation_time.
             currentTime = min(next_release_event, simulation_time)
+
+    # After simulation, update worst_response for any jobs still unfinished.
+    for job in jobs:
+        response_time = simulation_time - job["release"]
+        worst_response[job["task"]] = max(worst_response[job["task"]], response_time)
 
     return worst_response
 
@@ -125,7 +132,6 @@ def response_time_analysis(tasks):
     sorted_tasks = sorted(tasks, key=lambda x: x["Priority"])
     response_times = {}
 
-    # Process tasks in order of decreasing priority (highest priority first).
     for i, task in enumerate(sorted_tasks):
         C_i = task["WCET"]
         D_i = task["Deadline"]
@@ -142,7 +148,7 @@ def response_time_analysis(tasks):
                     math.ceil(R / higher_task["Period"]) * higher_task["WCET"]
                 )
             R = C_i + interference
-            # If the computed response time exceeds the deadline, the task is unschedulable.
+            # If the computed response time exceeds the deadline, mark as unschedulable.
             if R > D_i:
                 R = None
                 break
@@ -174,7 +180,7 @@ def simulate_multiple_runs(tasks, simulation_time, num_runs):
 
 
 def main():
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 4:
         print(
             "Usage: python3 simulator.py <filename.csv> <simulation_time> <simulation_iterations>"
         )
@@ -185,36 +191,45 @@ def main():
     try:
         simulation_time = int(sys.argv[2])  # Total simulation time in time units.
     except ValueError:
-        print("simulation_time must be a integer")
+        print("simulation_time must be an integer")
         sys.exit(1)
 
     try:
-        num_runs = int(sys.argv[3])  # Total simulation time in time units.
+        num_runs = int(sys.argv[3])  # Number of simulation runs.
     except ValueError:
-        print("simulation_iterations must be a integer")
+        print("simulation_iterations must be an integer")
         sys.exit(1)
 
     # Load task model from the CSV file.
     tasks = load_tasks(filename)
 
-    print("Running Very Simple Simulator (VSS)...")
-    # sim_wcrt = simulate(tasks, simulation_time)
-    sim_wcrt = simulate_multiple_runs(tasks, simulation_time, num_runs)
-
-    for task, wcrt in sim_wcrt.items():
-        print(f"Task {task}: Simulated WCRT = {wcrt} time units")
-
-    # Run Response-Time Analysis (RTA)
-    print("\nRunning Response-Time Analysis (RTA)...")
+    # Run VSS with random execution times (multiple runs).
+    vss_random = simulate_multiple_runs(tasks, simulation_time, num_runs)
+    # Run VSS with forced WCET.
+    vss_forced = simulate(tasks, simulation_time, force_wcet=True)
+    # Run RTA.
     rta_results = response_time_analysis(tasks)
-    # Print results in the original order as in the CSV file.
-    for task in tasks:
-        t_name = task["Task"]
-        wcrt = rta_results[t_name]
-        if wcrt is None:
-            print(f"Task {t_name}: UNSCHEDULABLE")
-        else:
-            print(f"Task {t_name}: RTA WCRT = {wcrt} time units")
+
+    # Print the results in a table.
+    header = (
+        f"{'Task':<6}{'VSS WCRT':<15}{'VSS (forced WCET) WCRT':<30}{'RTA WCRT':<15}"
+    )
+    print(header)
+    print("-" * len(header))
+    for t in tasks:
+        task_name = t["Task"]
+        vss_val = vss_random[task_name]
+        forced_val = vss_forced[task_name]
+        rta_val = rta_results[task_name]
+
+        # Mark forced simulation as unschedulable if its WCRT exceeds the task's deadline.
+        forced_str = f"{forced_val}"
+        if forced_val > t["Deadline"]:
+            forced_str += " (UNSCHEDULABLE)"
+        # Mark RTA as unschedulable if its value is None.
+        rta_str = f"{rta_val}" if rta_val is not None else "UNSCHEDULABLE"
+
+        print(f"{task_name:<6}{vss_val:<15}{forced_str:<30}{rta_str:<15}")
 
 
 if __name__ == "__main__":

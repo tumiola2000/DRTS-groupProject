@@ -55,7 +55,8 @@ def main():
     system = build_system(tasks, budgets, cores)
     print("System built successfully.")
     # Call the system function to process the parsed data
-    
+    print("Fixed Budget Scheduling Analysis")
+    print("===================================")
     for core in system:
         print(f"-- Core {core.core_id} --")
         for comp in core.components:

@@ -36,7 +36,7 @@ def main():
         sim_results.update(res)
 
     # Prepare solution.csv
-    out_file = "solution.csv"
+    out_file = "solution_large.csv"
     with open(out_file, "w", newline='') as csvfile:
         writer = csv.writer(csvfile)
         # Write header

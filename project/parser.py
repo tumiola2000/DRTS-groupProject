@@ -1,7 +1,10 @@
-from models import Core, Component, Task
+from models.tasks import Task
+from models.components import Component
+from models.cores import Core
+
 import csv
 
-DIR = "6-gigantic-test-case/"
+DIR = "test-cases/3-medium-test-case/"
 
 TASK_FILE = "tasks.csv"
 ARCHITECTURE_FILE = "architecture.csv"

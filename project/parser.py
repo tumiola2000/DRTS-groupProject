@@ -1,7 +1,7 @@
 from models import Core, Component, Task
 import csv
 
-DIR = "3-medium-test-case/"
+DIR = "6-gigantic-test-case/"
 
 TASK_FILE = "tasks.csv"
 ARCHITECTURE_FILE = "architecture.csv"

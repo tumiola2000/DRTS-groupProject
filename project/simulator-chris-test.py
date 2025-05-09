@@ -30,7 +30,7 @@ class Core:
     components: List[Component] = field(default_factory=list)
 
 def load_system():
-    directory = "4-large-test-case/"
+    directory = "test-cases/4-large-test-case/"
     tasks_csv = directory + 'tasks.csv'
     budgets_csv = directory + 'budgets.csv'
     arch_csv = directory + 'architecture.csv'

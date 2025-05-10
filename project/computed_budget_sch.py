@@ -1,9 +1,8 @@
-from math import floor
+from math import floor, lcm
 from typing import List, Tuple
 from parser import parse_task, parse_budget, parse_cores
 from models.tasks import Task
 from models.components import Component
-from models.cores import Core
 from fixed_budget_sch import build_system
 
 
@@ -17,7 +16,6 @@ def sbf_bdr(alpha: float, delta: float, t: float) -> float:
 
 def scheduling_points(tasks: List[Task]) -> List[float]:
     """All deadlines up to the hyperperiod."""
-    from math import lcm
     periods = [tau.period for tau in tasks]
     H = lcm(*map(int, periods))
     pts = set()

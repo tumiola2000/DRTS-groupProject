@@ -4,7 +4,7 @@ from models.cores import Core
 
 import csv
 #DIR = "test-cases/1-tiny-test-case/"
-#DIR = "test-cases/2-small-test-case/"
+DIR = "test-cases/2-small-test-case/"
 #DIR = "test-cases/3-medium-test-case/"
 #DIR = "test-cases/4-large-test-case/"
 #DIR = "test-cases/5-huge-test-case/"
@@ -12,7 +12,7 @@ import csv
 #DIR = "test-cases/7-unschedulable-test-case/"
 #DIR = "test-cases/8-unschedulable-test-case/"
 #DIR = "test-cases/9-unschedulable-test-case/"
-DIR = "test-cases/10-unschedulable-test-case/"
+#DIR = "test-cases/10-unschedulable-test-case/"
 
 TASK_FILE = "tasks.csv"
 ARCHITECTURE_FILE = "architecture.csv"

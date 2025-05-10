@@ -92,9 +92,11 @@ def compute_bdr_interface(comp: Component,
     best = None
     alpha = U
     while alpha <= 1.0:
-        #max_pt = max(pts)
         max_pt = lcm(*map(int, task_periods))   # allow Δ up to the hyperperiod
-        delta = 0.0
+        Q = alpha * comp.period
+        delta_min = comp.period - Q
+        delta = max(0.0, delta_min)
+        #delta = 0.0 creates a no delay system
         while delta <= max_pt:
             ok = True
             for t in pts:

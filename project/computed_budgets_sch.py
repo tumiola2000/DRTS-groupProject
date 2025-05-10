@@ -70,7 +70,7 @@ def scheduling_points(servers: List) -> List[float]:
 # ------------------------------------------------------------
 def compute_bdr_interface(comp: Component,
                           speed: float,
-                          alpha_step: float = 0.005,
+                          alpha_step: float = 0.001,
                           delta_step: float = 0.1
                          ) -> Tuple[float,float]:
     """

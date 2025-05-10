@@ -3,11 +3,13 @@ import statistics
 from dataclasses import dataclass, field
 from typing import Any, List, Dict
 from math import lcm
+import csv
 
 from parser import parse_task, parse_budget, parse_cores
 from models.tasks import Task
 from models.components import Component
 from models.cores import Core
+from fixed_budget_sch import build_system as build_analysis_system, is_component_schedulable
 
 # An event in the simulation (either a task release or a budget replenish)
 @dataclass(order=True)
@@ -147,18 +149,61 @@ def main():
     cores  = parse_cores()
 
     system = build_system(tasks, bufs, cores)
+    comp_analysis: Dict[str,bool] = {}
+    for core in system:
+        for comp in core.components:
+            ok, _ = is_component_schedulable(comp)
+            comp_analysis[comp.component_id] = ok
 
     horizon = 1
     for t in tasks:
         horizon = lcm(int(horizon), int(t.period))
 
-    print("Simulation results\n" + "-"*40)
+        sim_results: Dict[str, Dict[str, Any]] = {}
     for core in system:
-        print(f"\nCore {core.core_id} (speed={core.speed_factor}, sched={core.scheduler})")
-        results = simulate_core(core, horizon)
-        for name, m in results.items():
-            print(f"  {name:20s} avg={m['avg_rt']:.2f}  max={m['max_rt']:.2f}  "
-                  f"missed={m['missed']}  sup_util={m['sup_util']:.2f}")
+        res = simulate_core(core, horizon)
+        sim_results.update(res)
+
+    # --- 3) WRITE solution.csv ---
+    out_file = "sim_mine2.csv"
+    with open(out_file, "w", newline="") as f:
+        writer = csv.writer(f)
+        # header
+        writer.writerow([
+            "task_name",
+            "component_id",
+            "task_schedulable",
+            "avg_response_time",
+            "max_response_time",
+            "component_schedulable"
+        ])
+        # one row per task
+        for task in tasks:
+            comp_id = task.component_id
+            m = sim_results.get(task.task_name, {})
+            avg_rt = m.get("avg_rt", 0.0)
+            max_rt = m.get("max_rt", 0.0)
+            missed = m.get("missed", False)
+            task_sched = 0 if missed else 1
+            comp_sched = 1 if comp_analysis.get(comp_id, False) else 0
+            writer.writerow([
+                task.task_name,
+                comp_id,
+                task_sched,
+                f"{avg_rt:.3f}",
+                f"{max_rt:.3f}",
+                comp_sched
+            ])
+
+    print(f"Solution written to {out_file}")
+
+    # print("Simulation results\n" + "-"*40)
+    # for core in system:
+    #     print(f"\nCore {core.core_id} (speed={core.speed_factor}, sched={core.scheduler})")
+    #     results = simulate_core(core, horizon)
+    #     for name, m in results.items():
+    #         print(f"  {name:20s} avg={m['avg_rt']:.2f}  max={m['max_rt']:.2f}  "
+    #               f"missed={m['missed']}  sup_util={m['sup_util']:.2f}")
 
 if __name__ == "__main__":
     main()

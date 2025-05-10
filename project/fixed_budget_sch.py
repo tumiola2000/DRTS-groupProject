@@ -53,18 +53,33 @@ def main():
     budgets = parse_budget()
     cores = parse_cores()
     system = build_system(tasks, budgets, cores)
+
     print("System built successfully.")
-    # Call the system function to process the parsed data
     print("Fixed Budget Scheduling Analysis")
     print("===================================")
+
     for core in system:
         print(f"-- Core {core.core_id} --")
         for comp in core.components:
+            # ok, miss_t = is_component_schedulable(comp)
+            # if ok:
+            #     print(f"  • {comp.component_id}: Schedulable")
+            # else:
+            #     print(f"  • {comp.component_id}: Miss at t={miss_t}")
+            Q     = comp.budget
+            P     = comp.period
+            alpha = Q / P                # utilization
+            delta = P - Q                # worst-case delay
+
+            # check schedulability
             ok, miss_t = is_component_schedulable(comp)
-            if ok:
-                print(f"  • {comp.component_id}: Schedulable")
-            else:
-                print(f"  • {comp.component_id}: Miss at t={miss_t}")
+            status = "Schedulable" if ok else f"Miss at t={miss_t}"
+
+            # print full stats
+            print(f"  • {comp.component_id}: "
+                  f"α={alpha:.3f}, Δ={delta:.3f}, "
+                  f"Q={Q}, P={P} → {status}")
+        print()
 
 
 

@@ -4,8 +4,6 @@ import heapq
 import statistics
 from math import lcm
 from parser import parse_task, parse_budget, parse_cores
-from models.tasks import Task
-from models.components import Component
 from models.cores import Core
 
 # A tiny event type for our discrete‐event sim
@@ -65,7 +63,6 @@ def simulate_core(core: Core, horizon: float):
             job.deadline     = core.current_time + job.period
             job.next_release += job.period
             heapq.heappush(evq, Event(job.next_release, "release", job))
-            # mark its component ready
             parent = next(c for c in core.components if c.component_id==job.component_id)
             ready_comps.add(parent)
 
@@ -117,27 +114,27 @@ def simulate_core(core: Core, horizon: float):
     # aggregate metrics
     out = {}
     for c in core.components:
+        sup_util = c.budget / c.period
         for t in c.tasks:
             rts = t.response_times
             out[t.task_name] = {
                 "avg_rt": statistics.mean(rts) if rts else 0.0,
                 "max_rt": max(rts) if rts else 0.0,
-                "missed": any(rt>t.period for rt in rts)
+                "missed": any(rt>t.period for rt in rts),
+                "sup_util": sup_util
             }
     return out
 
 def main():
-    # 1) read
+
     tasks   = parse_task()
     budgets = parse_budget()
     cores   = parse_cores()
-
-    # 2) assemble and simulate
     sim_sys = build_system(tasks, budgets, cores)
-    # horizon = lcm of all tasks' periods
-    H=1
+    
+    horizon=1
     for t in tasks:
-        H = lcm(H, int(t.period))
+        H = lcm(horizon, int(t.period))
 
     sim_results = {}
     for core in sim_sys:
@@ -153,7 +150,7 @@ def main():
     with open("simulator.csv","w",newline="") as f:
         w=csv.writer(f)
         w.writerow(["task_name","component_id","task_schedulable",
-                    "avg_response_time","max_response_time","component_schedulable"])
+                    "avg_response_time","max_response_time","sup_util","component_schedulable"])
         for t in tasks:
             m = sim_results[t.task_name]
             w.writerow([
@@ -162,6 +159,7 @@ def main():
                 0 if m["missed"] else 1,
                 f"{m['avg_rt']:.3f}",
                 f"{m['max_rt']:.3f}",
+                f"{m['sup_util']:.3f}",
                 1 if comp_sched[t.component_id] else 0
             ])
 

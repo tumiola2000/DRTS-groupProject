@@ -4,8 +4,8 @@ from models.cores import Core
 
 import csv
 #DIR = "test-cases/1-tiny-test-case/"
-DIR = "test-cases/2-small-test-case/"
-#DIR = "test-cases/3-medium-test-case/"
+#DIR = "test-cases/2-small-test-case/"
+DIR = "test-cases/3-medium-test-case/"
 #DIR = "test-cases/4-large-test-case/"
 #DIR = "test-cases/5-huge-test-case/"
 #DIR = "test-cases/6-gigantic-test-case/"

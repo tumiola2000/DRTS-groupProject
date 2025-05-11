@@ -8,8 +8,8 @@ import csv
 #DIR = "test-cases/3-medium-test-case/"
 #DIR = "test-cases/4-large-test-case/"
 #DIR = "test-cases/5-huge-test-case/"
-#DIR = "test-cases/6-gigantic-test-case/"
-DIR = "test-cases/7-unschedulable-test-case/"
+DIR = "test-cases/6-gigantic-test-case/"
+#DIR = "test-cases/7-unschedulable-test-case/" #skoða
 #DIR = "test-cases/8-unschedulable-test-case/"
 #DIR = "test-cases/9-unschedulable-test-case/"
 #DIR = "test-cases/10-unschedulable-test-case/"

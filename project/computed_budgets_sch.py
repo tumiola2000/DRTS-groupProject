@@ -191,7 +191,8 @@ def main():
             if comp.core_id == core.core_id:
                 Q, P, D = comp_servers[comp.component_id]
                 # scale supply by speed: Q/speed
-                servers.append((Q / core.speed_factor, P, D))
+                #servers.append((Q / core.speed_factor, P, D)) # Might be double scaling
+                servers.append((Q, P, D))
         ok = is_schedulable_core(servers, core.scheduler)
         print(f"Core {core.core_id} ({core.scheduler}): {'Schedulable' if ok else 'Not schedulable'}")
 

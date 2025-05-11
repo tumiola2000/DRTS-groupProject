@@ -204,7 +204,7 @@ def main_computed():
     tasks   = parse_task()
     budgets = parse_budget()
     cores   = parse_cores()
-
+    sim_sys = build_system(tasks, budgets, cores)
     # 1) Compute BDR interfaces and override each component's budget
     core_map = {core.core_id: core for core in cores}
     for comp in budgets:
@@ -218,7 +218,7 @@ def main_computed():
         # comp.period = P
 
     # 2) Build and run the simulation exactly as before
-    sim_sys = build_system(tasks, budgets, cores)
+    
     horizon = 1
     for t in tasks:
         horizon = lcm(horizon, int(t.period))

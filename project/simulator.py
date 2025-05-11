@@ -133,11 +133,11 @@ def main():
     
     horizon=1
     for t in tasks:
-        H = lcm(horizon, int(t.period))
+        horizon = lcm(horizon, int(t.period))
 
     sim_results = {}
     for core in sim_sys:
-        sim_results.update(simulate_core(core, H))
+        sim_results.update(simulate_core(core, horizon))
 
     # 3) per‐component sched (all tasks must be non‐missed)
     comp_sched = {}
@@ -146,7 +146,7 @@ def main():
                                              for t in comp.tasks)
 
     # 4) write solution.csv
-    with open("simulator.csv","w",newline="") as f:
+    with open("simulator_output/unscheduable_test_case.csv","w",newline="") as f:
         w=csv.writer(f)
         w.writerow(["task_name","component_id","task_schedulable",
                     "avg_response_time","max_response_time","sup_util","component_schedulable"])

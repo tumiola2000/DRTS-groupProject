@@ -17,7 +17,7 @@ def build_system(tasks, budgets, cores):
 
 # This is analysis code for the system
 def dbf(tasks, t):
-    """EDF demand‐bound for implicit‐deadline jobs."""
+    """EDF demand-bound for implicit‐deadline jobs."""
     return sum(int(t // task.period) * task.wcet for task in tasks)
 
 def sbf(component, t: float) -> float:
@@ -48,7 +48,6 @@ def is_component_schedulable(comp):
 
 
 def main():
-    # Parse the input files
     tasks = parse_task()
     budgets = parse_budget()
     cores = parse_cores()
@@ -61,11 +60,6 @@ def main():
     for core in system:
         print(f"-- Core {core.core_id} --")
         for comp in core.components:
-            # ok, miss_t = is_component_schedulable(comp)
-            # if ok:
-            #     print(f"  • {comp.component_id}: Schedulable")
-            # else:
-            #     print(f"  • {comp.component_id}: Miss at t={miss_t}")
             Q     = comp.budget
             P     = comp.period
             alpha = Q / P                # utilization
@@ -76,9 +70,9 @@ def main():
             status = "Schedulable" if ok else f"Miss at t={miss_t}"
 
             # print full stats
-            print(f"  • {comp.component_id}: "
-                  f"α={alpha:.3f}, Δ={delta:.3f}, "
-                  f"Q={Q}, P={P} → {status}")
+            print(f" {comp.component_id}: "
+                  f"alpha={alpha:.3f}, Delta={delta:.3f}, "
+                  f"Q={Q}, P={P} -> {status}")
         print()
 
 

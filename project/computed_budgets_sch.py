@@ -182,7 +182,7 @@ def main():
         alpha, delta = compute_bdr_interface(comp, speed)
         Q, P, D = half_half_server(alpha, delta, comp.period)
         comp_servers[comp.component_id] = (Q, P, D)
-        print(f"Comp {comp.component_id}: α={alpha}, Δ={delta} → (Q={Q:.2f},P={P},D={D:.2f})")
+        print(f"Comp {comp.component_id}: alpha={alpha}, Delta={delta} -> (Q={Q:.2f},P={P},D={D:.2f})")
 
     print("\n=== Core-Level Schedulability (BDR) ===")
     for core in cores:

@@ -1,0 +1,6 @@
+
+=== BDR Interfaces per Component ===
+Comp Camera_Sensor: alpha=0.992, Delta=0.683 -> (Q=83.33,P=84.0,D=0.68)
+
+=== Core-Level Schedulability (BDR) ===
+Core Core_1 (RM): Schedulable

@@ -1,0 +1,11 @@
+System built successfully.
+Fixed Budget Scheduling Analysis
+===================================
+-- Core Core_1 --
+ Camera_Sensor: alpha=0.556, Delta=4.000, Q=5.0, P=9.0 -> Schedulable
+ Image_Processor: alpha=0.333, Delta=4.000, Q=2.0, P=6.0 -> Schedulable
+
+-- Core Core_2 --
+ Lidar_Sensor: alpha=0.333, Delta=2.000, Q=1.0, P=3.0 -> Schedulable
+ Control_Unit: alpha=0.667, Delta=3.000, Q=6.0, P=9.0 -> Schedulable
+

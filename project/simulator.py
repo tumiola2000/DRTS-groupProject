@@ -4,6 +4,7 @@ import statistics
 from math import lcm
 from parser import parse_task, parse_budget, parse_cores
 from models.cores import Core
+from computed_budgets_sch import compute_bdr_interface, half_half_server, is_schedulable_core
 
 # A tiny event type for our discrete‐event sim
 class Event:
@@ -31,7 +32,6 @@ def simulate_core(core: Core, horizon: float):
     """ Run until `horizon`, return dict task_name→{avg_rt,max_rt,missed}. """
     # event queue
     evq = []
-    # init: at t=0, each comp gets replenish, each task gets release
     for comp in core.components:
         heapq.heappush(evq, Event(0.0, "replenish", comp))
         for t in comp.tasks:
@@ -41,7 +41,6 @@ def simulate_core(core: Core, horizon: float):
             heapq.heappush(evq, Event(0.0, "release", t))
 
     ready_comps = set()
-    # run
     while evq and core.current_time < horizon:
         ev = heapq.heappop(evq)
         core.current_time = ev.time
@@ -54,7 +53,6 @@ def simulate_core(core: Core, horizon: float):
             # if any jobs still pending in c, make it ready
             if any(t.remaining>0 for t in c.tasks):
                 ready_comps.add(c)
-
         else:  # release
             job = ev.obj
             job.remaining    = job.wcet / core.speed_factor
@@ -87,7 +85,6 @@ def simulate_core(core: Core, horizon: float):
         else:
             task = min(runnables, key=lambda t: t.priority)
 
-        # how far can we run?
         next_evt = evq[0].time if evq else horizon
         run_until = min(core.current_time + comp.budget_left,
                         core.current_time + task.remaining,
@@ -146,7 +143,7 @@ def main():
                                              for t in comp.tasks)
 
     # 4) write solution.csv
-    with open("simulator_output/unscheduable_test_case.csv","w",newline="") as f:
+    with open("large.csv","w",newline="") as f:
         w=csv.writer(f)
         w.writerow(["task_name","component_id","task_schedulable",
                     "avg_response_time","max_response_time","sup_util","component_schedulable"])
@@ -163,6 +160,45 @@ def main():
             ])
 
     print("→ simulation done, wrote solution.csv")
+
+
+def main2():
+    tasks   = parse_task()
+    budgets = parse_budget()
+    cores   = parse_cores()
+    system  = build_system(tasks, budgets, cores)
+
+    # map core_id → speed_factor
+    core_map = {core.core_id: core for core in cores}
+
+    print("=== BDR Interfaces per Component ===")
+    comp_servers = {}
+    all_sched = True
+    for comp in budgets:
+        try:
+            speed = core_map[comp.core_id].speed_factor
+            alpha, delta = compute_bdr_interface(comp, speed)
+            Q, P, D = half_half_server(alpha, delta, comp.period)
+            comp_servers[comp.component_id] = (Q, P, D)
+            print(f"Comp {comp.component_id}: α={alpha:.3f}, Δ={delta:.3f} → (Q={Q:.2f},P={P},D={D:.2f})")
+        except RuntimeError:
+            # unschedulable component
+            print(f"Comp {comp.component_id}: **Not schedulable** (no α≤1 interface)")
+            all_sched = False
+
+    if not all_sched:
+        print("System is unschedulable: one or more components failed to find a BDR interface.")
+        return
+
+    print("=== Core-Level Schedulability (BDR) ===")
+    for core in cores:
+        servers = []
+        for comp in budgets:
+            if comp.core_id == core.core_id:
+                Q, P, D = comp_servers[comp.component_id]
+                servers.append((Q, P, D))
+        ok = is_schedulable_core(servers, core.scheduler)
+        print(f"Core {core.core_id} ({core.scheduler}): {'Schedulable' if ok else 'Not schedulable'}")
 
 if __name__=="__main__":
     main()

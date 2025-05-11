@@ -1,0 +1,69 @@
+System built successfully.
+Fixed Budget Scheduling Analysis
+===================================
+-- Core Core_1 --
+ Camera_Sensor: alpha=0.400, Delta=6.000, Q=4.0, P=10.0 -> Schedulable
+ Image_Processor: alpha=0.182, Delta=9.000, Q=2.0, P=11.0 -> Schedulable
+ Bitmap_Processor: alpha=0.300, Delta=7.000, Q=3.0, P=10.0 -> Schedulable
+
+-- Core Core_2 --
+ Lidar_Sensor: alpha=0.333, Delta=10.000, Q=5.0, P=15.0 -> Schedulable
+ Control_Unit: alpha=0.364, Delta=7.000, Q=4.0, P=11.0 -> Schedulable
+
+-- Core Core_3 --
+ GPS_Sensor: alpha=0.154, Delta=11.000, Q=2.0, P=13.0 -> Schedulable
+ Communication_Unit: alpha=0.231, Delta=10.000, Q=3.0, P=13.0 -> Schedulable
+ Proximity_Sensor: alpha=0.200, Delta=4.000, Q=1.0, P=5.0 -> Schedulable
+
+-- Core Core_4 --
+ Radar_Sensor: alpha=0.600, Delta=2.000, Q=3.0, P=5.0 -> Schedulable
+ Sonar_Sensor: alpha=0.263, Delta=14.000, Q=5.0, P=19.0 -> Schedulable
+
+-- Core Core_5 --
+ Laser_Sensor: alpha=0.444, Delta=5.000, Q=4.0, P=9.0 -> Schedulable
+ Infrared_Sensor: alpha=0.333, Delta=4.000, Q=2.0, P=6.0 -> Schedulable
+
+-- Core Core_6 --
+ Ultraviolet_Sensor: alpha=0.250, Delta=9.000, Q=3.0, P=12.0 -> Schedulable
+ Thermal_Sensor: alpha=0.500, Delta=1.000, Q=1.0, P=2.0 -> Schedulable
+
+-- Core Core_7 --
+ Pressure_Sensor: alpha=0.125, Delta=7.000, Q=1.0, P=8.0 -> Schedulable
+ Humidity_Sensor: alpha=0.667, Delta=1.000, Q=2.0, P=3.0 -> Schedulable
+
+-- Core Core_8 --
+ Temperature_Sensor: alpha=0.625, Delta=12.000, Q=20.0, P=32.0 -> Schedulable
+ Light_Sensor: alpha=0.217, Delta=18.000, Q=5.0, P=23.0 -> Schedulable
+
+-- Core Core_9 --
+ Sound_Sensor: alpha=0.378, Delta=23.000, Q=14.0, P=37.0 -> Schedulable
+ Vibration_Sensor: alpha=0.125, Delta=7.000, Q=1.0, P=8.0 -> Schedulable
+
+-- Core Core_10 --
+ Motion_Sensor: alpha=0.279, Delta=44.000, Q=17.0, P=61.0 -> Schedulable
+ Acceleration_Sensor: alpha=0.312, Delta=11.000, Q=5.0, P=16.0 -> Schedulable
+
+-- Core Core_11 --
+ Gyroscope_Sensor: alpha=0.333, Delta=6.000, Q=3.0, P=9.0 -> Schedulable
+ Magnetometer_Sensor: alpha=0.143, Delta=6.000, Q=1.0, P=7.0 -> Schedulable
+
+-- Core Core_12 --
+ Compass_Sensor: alpha=0.167, Delta=10.000, Q=2.0, P=12.0 -> Schedulable
+ Altimeter_Sensor: alpha=0.111, Delta=8.000, Q=1.0, P=9.0 -> Schedulable
+
+-- Core Core_13 --
+ Barometer_Sensor: alpha=0.556, Delta=4.000, Q=5.0, P=9.0 -> Schedulable
+ Hygrometer_Sensor: alpha=0.261, Delta=17.000, Q=6.0, P=23.0 -> Schedulable
+
+-- Core Core_14 --
+ Anemometer_Sensor: alpha=0.500, Delta=1.000, Q=1.0, P=2.0 -> Schedulable
+ Rain_Gauge_Sensor: alpha=0.500, Delta=8.000, Q=8.0, P=16.0 -> Schedulable
+
+-- Core Core_15 --
+ Snow_Gauge_Sensor: alpha=0.231, Delta=10.000, Q=3.0, P=13.0 -> Schedulable
+ Thermometer_Sensor: alpha=0.500, Delta=6.000, Q=6.0, P=12.0 -> Schedulable
+
+-- Core Core_16 --
+ Pyrometer_Sensor: alpha=0.111, Delta=8.000, Q=1.0, P=9.0 -> Schedulable
+ Photometer_Sensor: alpha=0.600, Delta=6.000, Q=9.0, P=15.0 -> Schedulable
+

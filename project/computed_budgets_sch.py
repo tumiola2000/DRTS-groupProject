@@ -196,5 +196,7 @@ def main():
         ok = is_schedulable_core(servers, core.scheduler)
         print(f"Core {core.core_id} ({core.scheduler}): {'Schedulable' if ok else 'Not schedulable'}")
 
+
+
 if __name__ == "__main__":
     main()

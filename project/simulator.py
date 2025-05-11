@@ -200,5 +200,63 @@ def main2():
         ok = is_schedulable_core(servers, core.scheduler)
         print(f"Core {core.core_id} ({core.scheduler}): {'Schedulable' if ok else 'Not schedulable'}")
 
-if __name__=="__main__":
-    main()
+def main_computed():
+    tasks   = parse_task()
+    budgets = parse_budget()
+    cores   = parse_cores()
+
+    # 1) Compute BDR interfaces and override each component's budget
+    core_map = {core.core_id: core for core in cores}
+    for comp in budgets:
+        speed = core_map[comp.core_id].speed_factor
+        alpha, delta = compute_bdr_interface(comp, speed)
+        Q, P, D     = half_half_server(alpha, delta, comp.period)
+        # override the CSV‐read budget with the computed Q
+        comp.budget = Q
+        # keep comp.period unchanged (P == comp.period)
+        # (if you want to override period, uncomment next line)
+        # comp.period = P
+
+    # 2) Build and run the simulation exactly as before
+    sim_sys = build_system(tasks, budgets, cores)
+    horizon = 1
+    for t in tasks:
+        horizon = lcm(horizon, int(t.period))
+
+    sim_results = {}
+    for core in sim_sys:
+        sim_results.update(simulate_core(core, horizon))
+
+    # 3) Collect per‐component schedulability
+    comp_sched = {
+        comp.component_id:
+        all(not sim_results[t.task_name]["missed"] for t in comp.tasks)
+        for comp in budgets
+    }
+
+    # 4) Write out results
+    with open("computed_solution.csv", "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow([
+            "task_name", "component_id", "task_schedulable",
+            "avg_response_time", "max_response_time",
+            "sup_util", "component_schedulable"
+        ])
+        for t in tasks:
+            m = sim_results[t.task_name]
+            w.writerow([
+                t.task_name,
+                t.component_id,
+                0 if m["missed"] else 1,
+                f"{m['avg_rt']:.3f}",
+                f"{m['max_rt']:.3f}",
+                f"{m['sup_util']:.3f}",
+                1 if comp_sched[t.component_id] else 0
+            ])
+
+    print("→ simulation with computed budgets done, wrote computed_solution.csv")
+
+
+if __name__ == "__main__":
+    main_computed()
+    #main()

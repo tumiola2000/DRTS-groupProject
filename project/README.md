@@ -1,113 +1,117 @@
+# Distributed Real-Time Systems (DRTS) Project
 
-# 02225 Project Test Cases
+This project implements a hierarchical scheduling system simulator and analysis tool for distributed real-time systems. It supports both Rate Monotonic (RM) and Earliest Deadline First (EDF) scheduling algorithms at both the core and component levels.
 
-This folder contains test cases in a CSV format that define test cases for the 02225 DRTS project. These files specify the task set, architecture model, and initial component budgets/periods for a hierarchical scheduling system.  
+## Project Structure
 
-## Files
-
-*   **`tasks.csv`:**  Defines the task set, including task parameters and component assignments.
-*   **`architecture.csv`:** Defines the hardware platform (cores and their speeds).
-*   **`budgets.csv`:** Defines the initial budget and period for each component, along with the component-to-core mapping.
-*   **`solution.csv`:** *Suggested* output file format for reporting results. [in progress]
-
-## Input and Output Flow Diagram
-
-```mermaid
-graph TD
-    A1["tasks.csv<br>(Task Set)"]
-    B1["architecture.csv<br>(Architecture Model)"]
-    C1["budgets.csv<br>(Initial Budgets/Periods,<br>Component-Core Mapping)"]
-    D1["Simulator tool or\nAnalysis tool"]
-    E1["solution.csv<br>(Suggested Output:<br>Schedulability, Response Times)"]
-
-    A1 --> D1
-    B1 --> D1
-    C1 --> D1
-    D1 --> E1
-
-    style D1 fill:#ffff99
+```
+.
+├── models/                 # Core system models
+├── output/                # Output directory for simulation results
+├── test-cases/           # Test cases and input files
+├── simulator.py          # Main simulation engine
+├── parser.py             # Input file parsing utilities
+├── computed_budgets_sch.py # BDR interface computation
+└── fixed_budget_sch.py   # Fixed budget scheduling implementation
 ```
 
-## `tasks.csv` - Task Set
+## Prerequisites
 
-This file describes the individual tasks within the system.
+- Python 3.6 or higher
+- Required Python packages:
+  - csv
+  - heapq
+  - statistics
+  - math
 
-**Columns:**
+## Input Files
 
-*   **`task_name`:**  The name of the task (string).
-*   **`wcet`:** The Worst-Case Execution Time (WCET) of the task in time units, assuming a nominal core speed (speed\_factor = 1.0) (float).
-*   **`period`:** The period of the task in time units (float).
-*   **`component_id`:**  The ID of the component to which the task is assigned (string).  
-*   **`priority`:**  The priority of the task (integer).  This column is *only* relevant for tasks within components that use RM scheduling.  For EDF components, this column will be empty. Priorities are assigned based on the Rate Monotonic (RM) principle (shorter period = higher priority).
+The system requires three main input files in CSV format:
 
-## `architecture.csv` - Architecture Model
+### 1. `tasks.csv`
 
-This file describes the hardware platform, specifically the cores and their relative speeds.
+Defines the task set with the following columns:
 
-**Columns:**
+- `task_name`: Unique identifier for the task
+- `wcet`: Worst-Case Execution Time (assuming nominal core speed)
+- `period`: Task period in time units
+- `component_id`: ID of the component the task belongs to
+- `priority`: Task priority (only for RM-scheduled components)
 
-*   **`core_id`:**  A unique identifier for the core (string).
-*   **`speed_factor`:**  A numerical value representing the core's speed relative to a nominal speed.  `1.0` represents the nominal speed.  A value of `0.5` indicates a core that is 50% slower, and a value of `1.2` indicates a core that is 20% faster.  The WCET of tasks assigned to a core must be adjusted by dividing the nominal WCET by the `speed_factor`.
-*   **`scheduler`:** Top level scheduler for this core, `RM` or `EDF`. This scheduler will schedule Components within the core.
+### 2. `architecture.csv`
 
-## `budgets.csv` - Initial Budgets, Periods, and Component-Core Mapping
+Defines the hardware platform:
 
-This file provides the initial budget and period for each component, derived from PRM interface parameters (Theta, Pi). It also shows which core the component is assigned to.
+- `core_id`: Unique identifier for the core
+- `speed_factor`: Core speed relative to nominal speed (1.0 = nominal)
+- `scheduler`: Top-level scheduler type ('RM' or 'EDF')
 
-**Columns:**
+### 3. `budgets.csv`
 
-*   **`component_id`:** The ID of the component (string).  This matches the `component_id` used in `tasks.csv`.
-*   **`scheduler`:** The scheduling algorithm used for the component (either `EDF` or `RM`) (string). This scheduler will schedule Tasks within the component.
-*   **`budget`:**  The initial budget (Q) for the component, in time units (float). This value represents the resource allocation for each component.
-*   **`period`:** The initial period (P) for the component, in time units (float).
-*    **`core_id`:**  The ID of the core to which the component is assigned (string). This corresponds to the `core_id` in `architecture.csv`.
-*   **`priority`:** The priority of the component (integer). This column is *only* relevant for components within cores that use RM scheduling as the top level scheduler.  For EDF cores, this column will be empty. Priorities are assigned based on the Rate Monotonic (RM) principle (shorter period = higher priority).
+Defines component budgets and mappings:
 
-**Important Notes:**
+- `component_id`: Component identifier
+- `scheduler`: Component-level scheduler ('RM' or 'EDF')
+- `budget`: Initial budget in time units
+- `period`: Component period in time units
+- `core_id`: Assigned core identifier
+- `priority`: Component priority (only for RM-scheduled cores)
 
-*   **Initial Values:** The budget and period values are *initial* values derived from a PRM-based analysis. Students are expected to treat these as starting points and may need to further optimize them. They are also expected to perform BDR based analysis.
+## Running the Simulator
 
-## Suggested Output Format
+1. Place your input files in the appropriate directory:
 
-This file is a *suggestion* for how students might report the results of their simulator and analysis tool.  Students are free to modify the input and output formats as they see fit for their project.
+   - Task definitions in `tasks.csv`
+   - Architecture model in `architecture.csv`
+   - Budget definitions in `budgets.csv`
 
-**Suggested Columns:**
+You can modify which test case you want to use in the parse.py
 
-*   **`task_name`:** The name of the task (string).
-*   **`component_id`:** The ID of the component the task belongs to (string).
-*   **`task_schedulable`:**  A boolean value (0 or 1, or "TRUE"/"FALSE") indicating whether the task is schedulable according to the analysis tool (and simulator).
-*   **`avg_response_time`:** The average response time of the task, as observed by the simulator (float).
-*   **`max_response_time`:** The maximum response time of the task, as observed by the simulator (float).
-* **`component_schedulable`** A boolean value indicating if *all* tasks within the component were schedulable.
+2. Run the simulator:
 
-**Note:**  The `avg_response_time` and `max_response_time` are typically outputs of the *simulator*, not the analysis tool.  The analysis tool usually focuses on *schedulability* (whether deadlines are met), not precise response times.  The analysis tool *could* potentially compute Worst-Case Response Times (WCRT), but that's an optional extension in the project description.
+   ```bash
+   python simulator.py
+   ```
 
-**Additional Output (Optional):**
+3. The simulator will generate a `solution.csv` file containing:
+   - Task schedulability results
+   - Average and maximum response times
+   - Component-level schedulability
+   - Support utilization metrics
 
-Students might also consider including other information in their output, such as:
+## Output Format
 
-*   **Calculated BDR parameters (alpha, delta) for each component.**
-*   **Core utilization.**
-*    **Number of preemptions.**
-*   **Other relevant metrics.**
+The `solution.csv` output file contains:
 
-**Flexibility:**
+- `task_name`: Task identifier
+- `component_id`: Component identifier
+- `task_schedulable`: Boolean (0/1) indicating task schedulability
+- `avg_response_time`: Average task response time
+- `max_response_time`: Maximum task response time
+- `sup_util`: Support utilization
+- `component_schedulable`: Boolean indicating component schedulability
 
-It is important to emphasize that both the input CSV formats and the suggested output format are *flexible*.  Students can add columns, modify the structure, or use different file formats altogether, as long as their choices are clearly documented and justified in their project report.  The key is that their tools should be able to read their chosen input format and produce meaningful output that allows them to analyze the system's behavior.
+## Features
 
+- Hierarchical scheduling system simulation
+- Support for both RM and EDF scheduling
+- BDR interface computation
+- Response time analysis
+- Component-level schedulability analysis
+- Core-level schedulability analysis
 
-**`solution.csv` (Just an example; response times are placeholders):**
+## Implementation Details
 
-```csv
-task_name,component_id,task_schedulable,avg_response_time,max_response_time,component_schedulable
-Task_1,Component_1,1,0.0,0.0,1
-Task_2,Component_1,1,0.0,0.0,1
-Task_3,Component_1,1,0.0,0.0,1
-Task_4,Component_2,1,0.0,0.0,1
-Task_5,Component_2,1,0.0,0.0,1
-Task_6,Component_2,1,0.0,0.0,1
-Task_7,Component_3,1,0.0,0.0,1
-Task_8,Component_3,1,0.0,0.0,1
-Task_9,Component_3,1,0.0,0.0,1
-Task_10,Component_3,1,0.0,0.0,1
-```
+The system implements:
+
+1. A discrete-event simulator for real-time task execution
+2. BDR interface computation for component-level analysis
+3. Core-level schedulability analysis
+4. Response time measurement and analysis
+
+## Notes
+
+- The initial budget and period values in `budgets.csv` are starting points derived from PRM-based analysis
+- The system supports both fixed and computed budgets
+- Response times are measured through simulation
+- The analysis tool focuses on schedulability verification
